@@ -117,6 +117,26 @@ describe("DELETE /api/v1/sessions", () => {
         path: "/",
         httpOnly: true,
       });
+
+      const doubleCheckResponse = await fetch(
+        "http://localhost:3000/api/v1/users",
+        {
+          headers: {
+            Cookie: `session_id=${sessionObject.token}`,
+          },
+        },
+      );
+
+      expect(doubleCheckResponse.status).toBe(401);
+
+      const doubleCheckResponseBody = await doubleCheckResponse.json();
+
+      expect(doubleCheckResponseBody).toEqual({
+        name: "UnauthorizedError",
+        message: "Usuario nao possui sessao ativa.",
+        action: "Verifique se este usuario esta logado e tente novamente.",
+        status_code: 401,
+      });
     });
   });
 });
